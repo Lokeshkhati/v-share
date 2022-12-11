@@ -2,7 +2,7 @@ import React, { useRef, useState } from "react";
 import { RiImageAddLine } from "react-icons/ri";
 import { MdOutlineClose } from "react-icons/md";
 
-const EditProfile = ({ userInfo, setUserInfo }) => {
+const EditProfile = ({ userInfo, setUserInfo, setShowModal }) => {
   const { name, bio, website } = userInfo;
 
   const imgRef = useRef(null);
@@ -23,13 +23,16 @@ const EditProfile = ({ userInfo, setUserInfo }) => {
       <form onSubmit={handleSubmit}>
         <div className="flex justify-between items-center">
           <div className="flex gap-6 items-center">
-            <button className="  hover:text-[#FF3B30]">
+            <button onClick={()=>setShowModal(false)} className="  hover:text-[#FF3B30]">
               <MdOutlineClose size="25" />
             </button>
 
             <h1 className="font-bold ">Edit Profile</h1>
           </div>
-          <button className="bg-[#FF3B30] px-4 py-1 sm:w-24  font-semi-bold text-[#FFFFFF] ">
+          <button
+            type="submit"
+            className="bg-[#FF3B30] px-4 py-1 sm:w-24  font-semi-bold text-[#FFFFFF] "
+          >
             Save
           </button>
         </div>

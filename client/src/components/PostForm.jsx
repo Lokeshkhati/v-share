@@ -1,17 +1,37 @@
-import React, { useState, useRef } from "react";
+import { useState, useRef } from "react";
 import { GrImage } from "react-icons/gr";
 import { BsEmojiHeartEyes } from "react-icons/bs";
 import { AiOutlineGif } from "react-icons/ai";
 import { usePosts } from "../contexts/posts-context";
+import * as api from "../api";
 
 const Input = () => {
   const [inputValue, setInputValue] = useState("");
   const [selectedFile, setSelectedFile] = useState(null);
-  // const [showEmojis, setShowEmojis] = useState(false);
+  const [showEmojis, setShowEmojis] = useState(false);
   // const [loading, setLoading] = useState(false);
   const filePickerRef = useRef(null);
-  const { createPost } = usePosts();
+  const { dispatch } = usePosts();
   const addImageToPost = () => {};
+
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+    dispatch({ type: "CREATE_POST_BEGIN" });
+
+    try {
+      const newPost = {
+        content: inputValue,
+      };
+      await api.createPost(newPost);
+
+      dispatch({ type: "CREATE_POST_SUCCESS" });
+      setInputValue("");
+    } catch (error) {
+      // dispatch({ type: "CREATE_POST_ERROR" });
+      console.log(error.message);
+    }
+  };
+
   return (
     <div className="overflow-hidden flex bg-white p-4  sm:p-6 space-x-3 ">
       <img
@@ -19,7 +39,7 @@ const Input = () => {
         src="https://avatars.githubusercontent.com/u/5550850?v=4"
         alt="brad"
       />
-      <div className="w-full ">
+      <form onSubmit={handleSubmit} className="w-full ">
         <div
           className={`${selectedFile && "pb-7"} ${inputValue && "space-y-2.5"}`}
         >
@@ -76,17 +96,14 @@ const Input = () => {
           </div>
 
           <button
-            onClick={() => {
-              createPost(inputValue);
-              setInputValue("");
-            }}
+            type="submit"
             className="bg-[#FF3B30] px-4 py-1 sm:w-24  font-semi-bold text-[#FFFFFF] "
             disabled={!inputValue.trim() && !selectedFile}
           >
             Post
           </button>
         </div>
-      </div>
+      </form>
     </div>
   );
 };

@@ -42,8 +42,8 @@ const MobileMenu = ({ setIsOpen }) => {
               d="M0 0L10 10M10 0L0 10"
               fill="none"
               stroke="currentColor"
-              stroke-width="2"
-              stroke-linecap="round"
+              strokeWidth="2"
+              strokeLinecap="round"
             ></path>
           </svg>
         </button>

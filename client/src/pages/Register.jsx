@@ -1,5 +1,7 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import * as api from "../api";
+
 const Register = () => {
   const [formData, setFormData] = useState({
     fullName: "",
@@ -8,6 +10,8 @@ const Register = () => {
     password: "",
   });
   const { fullName, username, email, password } = formData;
+
+  const navigate = useNavigate();
   const handleChange = (event) => {
     const { name, value } = event.target;
     setFormData((prevFormData) => {
@@ -17,9 +21,23 @@ const Register = () => {
       };
     });
   };
+
+  const register = async (event) => {
+    event.preventDefault();
+    try {
+      await api.register(formData);
+      navigate("/login", { replace: true });
+    } catch (error) {
+      console.log(error.message);
+    }
+  };
+
   return (
     <div className="flex  justify-center items-center h-screen">
-      <form className=" flex flex-col p-4  items-center w-96 border-2 border-gray-200 rounded ">
+      <form
+        onSubmit={register}
+        className=" flex flex-col p-4  items-center w-96 border-2 border-gray-200 rounded "
+      >
         <h1 className="text-2xl font-bold ">Sign UP</h1>
         <div className="w-full mt-2.5  ">
           <label className="   font-semibold px-1">Full Name</label>
@@ -30,7 +48,7 @@ const Register = () => {
             onChange={handleChange}
             required
             type="text"
-            className="w-full mt-2  pl-4  py-1.5 rounded border-2 outline-none focus:border-indigo-500"
+            className="w-full mt-2  pl-4  py-1.5 rounded border-2 outline-none focus:border-[#FF3B30]"
             placeholder="John Doe"
           />
         </div>{" "}
@@ -43,7 +61,7 @@ const Register = () => {
             onChange={handleChange}
             required
             type="text"
-            className="w-full mt-2  pl-4  py-1.5 rounded border-2 outline-none focus:border-indigo-500"
+            className="w-full mt-2  pl-4  py-1.5 rounded border-2 outline-none focus:border-[#FF3B30]"
             placeholder="johndoe"
           />
         </div>
@@ -56,7 +74,7 @@ const Register = () => {
             onChange={handleChange}
             required
             type="email"
-            className="w-full mt-2  pl-4  py-1.5 rounded border-2 outline-none focus:border-indigo-500"
+            className="w-full mt-2  pl-4  py-1.5 rounded border-2 outline-none focus:border-[#FF3B30]"
             placeholder="johndoe@example.com"
           />
         </div>
@@ -69,14 +87,14 @@ const Register = () => {
             onChange={handleChange}
             required
             type="password"
-            className="w-full mt-2  pl-4  py-1.5 rounded border-2 outline-none focus:border-indigo-500"
+            className="w-full mt-2  pl-4  py-1.5 rounded border-2 outline-none focus:border-[#FF3B30]"
             placeholder="**********"
           />
         </div>
         <div className="w-full  mt-2 ">
           <button
             type="submit"
-            className=" w-full  text-lg mx-auto bg-indigo-500 text-white rounded  py-2 m-3 "
+            className=" w-full  text-lg mx-auto bg-[#FF3B30] text-white rounded-sm  py-2 m-3 "
           >
             Create New Account
           </button>
@@ -84,7 +102,7 @@ const Register = () => {
         <div className="text-md">
           <span className="  ">Already have an account? </span>
           <Link
-            className=" text-indigo-500 hover:underline font-semibold"
+            className=" text-[#FF3B30] hover:underline font-semibold"
             to="/login"
           >
             LogIn

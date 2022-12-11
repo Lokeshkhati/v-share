@@ -9,8 +9,8 @@ const Widgets = () => {
           <Searchbar />
         </div>
         <WhoToFollow />
-        <WhoToFollow />
-        <WhoToFollow />
+        {/* <WhoToFollow />
+        <WhoToFollow /> */}
       </div>
     </>
   );

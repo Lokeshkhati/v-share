@@ -1,13 +1,15 @@
 import { useState } from "react";
+import { useAuth } from "../contexts/auth-context";
 import { usePosts } from "../contexts/posts-context";
 import EditProfile from "./EditProfile";
 import Modal from "./Modal";
 
 const ProfileHeader = () => {
   // const ProfileHeader = ({ userProfile, posts }) => {
+  const { user } = useAuth();
   const [showModal, setShowModal] = useState(false);
   const [userInfo, setUserInfo] = useState({
-    name: "lokesh",
+    name: user.fullName,
     bio: "khatikhati khati",
     website: "https://beta.reactjs.org/learn/updating-objects-in-state",
   });
@@ -26,7 +28,7 @@ const ProfileHeader = () => {
           />
           <div className=" flex  flex-col justify-center items-center gap-2">
             <span className="font-bold text-lg"> {name} </span>
-            <span className="text-[#9A9A9A] text-lg">@{name}</span>
+            <span className="text-[#9A9A9A] text-lg">@{user.username}</span>
             <button
               onClick={() => setShowModal(!showModal)}
               className="px-4 py-1 border border-[#9A9A9A]"
@@ -71,7 +73,11 @@ const ProfileHeader = () => {
       </div>
       <Modal showModal={showModal} setShowModal={setShowModal}>
         <div className="max-w-2xl w-[20rem] sm:w-[30rem]">
-          <EditProfile userInfo={userInfo} setUserInfo={setUserInfo} />
+          <EditProfile
+            userInfo={userInfo}
+            setUserInfo={setUserInfo}
+            setShowModal={setShowModal}
+          />
         </div>
       </Modal>
     </>

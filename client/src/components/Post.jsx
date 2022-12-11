@@ -11,6 +11,9 @@ import { TfiComment } from "react-icons/tfi";
 
 import { BsThreeDots } from "react-icons/bs";
 import { usePosts } from "../contexts/posts-context";
+import * as api from "../api";
+
+import moment from "moment";
 
 const Post = ({ post }) => {
   const {
@@ -20,12 +23,31 @@ const Post = ({ post }) => {
     removePostFromBookmarks,
     addLikeToPost,
     removeLikeFromPost,
+    dispatch,
   } = usePosts();
+  console.log(post)
+
   const [toggle, setToggle] = useState(false);
   const [isLiked, setIsLiked] = useState(false);
 
-  const bookmarkedPosts = bookmarks.find((bookmark) => bookmark.id === post.id);
+  const dateTimeAgo = moment(new Date(post.createdAt)).fromNow();
+
+  const bookmarkedPosts = bookmarks?.find(
+    (bookmark) => bookmark?.id === post._id
+  );
   const isBookmarked = bookmarkedPosts ? true : false;
+
+  console.log(post._id);
+  const likeAndUnlike = async () => {
+    await api.like(post._id);
+    // const { data } = await api.like(post._id);
+    // console.log(data);
+    // const { posts } = data;
+    // const { likes } = posts;
+    dispatch({ type: "LIKE_OR_UNLIKE" });
+    // dispatch({ type: "LIKE_OR_UNLIKE", payload: { likes } });
+  };
+
   return (
     <div className="flex my-5 bg-white p-2.5 sm:p-5 space-x-3 ">
       <img
@@ -36,34 +58,32 @@ const Post = ({ post }) => {
       <div className="w-full ">
         <div className="flex items-center text-md  justify-between">
           <div className="flex gap-2 items-center">
-            <h1 className="font-bold ">Lokesh </h1>
-            <span className="text-[#9A9A9A]">@lokesh</span>
+            <h1 className="font-bold ">{post.authorName} </h1>
+            <span className="text-[#9A9A9A]">@ {post.authorUserName} </span>
             <div className="w-1.5 h-1.5  rounded-full bg-[#9A9A9A]"></div>
-            <span className="text-[#9A9A9A]">1m </span>
+            <span className="text-[#9A9A9A]">{dateTimeAgo}</span>
           </div>
           <button className="font-bold  text-[#9A9A9A]">
             <BsThreeDots size="18" />
           </button>
         </div>
         <div className="mt-2">
-          <span className=" tracking-wide ">{post?.text}</span>
+          <span className=" tracking-wide ">{post?.content}</span>
         </div>
 
         <div className="text-[#9A9A9A]  flex justify-between items-center mt-2 pt-2.5">
           <div
             onClick={() => setIsLiked(!isLiked)}
-            className="flex justify-between items-center gap-4 "
+            className="flex justify-between items-center gap-2 "
           >
-            {isLiked ? (
-              <button onClick={removeLikeFromPost}>
+            <button onClick={likeAndUnlike}>
+              {isLiked ? (
                 <BsHeartFill color="#e11d48" size="20" />
-              </button>
-            ) : (
-              <button onClick={addLikeToPost} className="hover:text-orange-600">
+              ) : (
                 <BsHeart size="20" />
-              </button>
-            )}
-            {likes.length}
+              )}
+            </button>
+            {post.likes.length > 0 && post.likes.length}
           </div>
           <div className="flex justify-between items-center gap-4 ">
             <button>

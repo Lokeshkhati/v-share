@@ -1,11 +1,30 @@
 const PostsReducer = (state, action) => {
     switch (action.type) {
 
-        case "CREATE_POST":
+        case "CREATE_POST_BEGIN":
             return {
                 ...state,
-                posts: [...state.posts, { id: Math.random() * 100, text: action.payload }]
+                isLoading: true
+
             }
+        case "CREATE_POST_SUCCESS":
+            return {
+                ...state,
+                isLoading: false
+            }
+        case "SET_USER_POSTS":
+            return {
+                ...state,
+                isLoading: false,
+                userCreatedPosts: action.payload
+            }
+        case "GET_ALL_POSTS":
+            return {
+                ...state,
+                isLoading: false,
+                posts: action.payload.posts,
+            }
+
         case "DELETE_POST":
             return {
                 ...state,

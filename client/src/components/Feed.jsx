@@ -1,8 +1,7 @@
-import React from "react";
 import Post from "./Post";
 
 const Feed = ({ posts }) => {
-  const postsList = posts?.map((post) =>  <Post post={post} /> );
+  const postsList = posts?.map((post) => <Post key={post.id} post={post} />);
   return <div>{postsList}</div>;
 };
 

@@ -1,18 +1,16 @@
-// import { usePosts } from "../contexts/posts-context";
+import { usePosts } from "../contexts/posts-context";
 
 import { Post, ProfileHeader } from "../components";
 
 const Profile = () => {
-  //   const { posts } = usePosts();
-  //   const filteredPosts = posts.filter(
-  //     (post) => post.username === userProfile.username
-  //   );
+  const { posts } = usePosts();
+  // const filteredPosts = posts.filter((post) => post.username === user.username);
   return (
     <div className="">
       <ProfileHeader />
       {/* <ProfileHeader userProfile={userProfile} posts={posts} /> */}
       <h1 className="font-bold text-lg mt-8">Your Posts</h1>
-      <Post />
+      {/* <Post /> */}
 
       {/* {filteredPosts
         .slice()
@@ -20,6 +18,10 @@ const Profile = () => {
         .map((post) => (
           <Post data={post} />
         ))} */}
+
+      {posts.map((post) => (
+        <Post post={post} />
+      ))}
     </div>
   );
 };

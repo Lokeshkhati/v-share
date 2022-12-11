@@ -1,17 +1,44 @@
+import axios from "axios";
 import { useState } from "react";
-import {Link} from "react-router-dom"
+import { Link, useNavigate } from "react-router-dom";
+import * as api from "../api";
+import { useAuth } from "../contexts/auth-context";
+
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+
+  const { setToken, setUser } = useAuth();
+  const navigate = useNavigate();
+
+  const login = async (event) => {
+    event.preventDefault();
+    try {
+      const formData = { email, password };
+      const { data } = await api.login(formData);
+      const { user, token } = data;
+      if (token) {
+        navigate("/", { replace: true });
+      }
+      const { fullName, username } = user;
+      setToken(token);
+      setUser({ fullName, username });
+    } catch (error) {
+      console.log(error.message);
+    }
+  };
   return (
     <div className="flex  justify-center items-center h-screen">
-      <form className=" flex flex-col p-4   w-96 border-2 rounded border-gray-200 ">
+      <form
+        onSubmit={login}
+        className=" flex flex-col p-4   w-96 border-2 rounded border-gray-200 "
+      >
         <h1 className=" text-2xl font-bold text-center ">LogIn</h1>
 
         <div className="text-md mt-2 text-center">
           <span className="  ">Don't have an account? </span>
           <Link
-            className=" text-indigo-500 hover:underline font-semibold"
+            className=" text-[#FF3B30] hover:underline font-semibold"
             to="/register"
           >
             Register
@@ -26,7 +53,7 @@ const Login = () => {
             onChange={(event) => setEmail(event.target.value)}
             required
             type="email"
-            className="w-full mt-2  pl-4  py-1.5 rounded border-2 outline-none focus:border-indigo-500"
+            className="w-full mt-2  pl-4  py-1.5 rounded border-2 outline-none focus:border-[#FF3B30]"
             placeholder="johndoe@example.com"
           />
         </div>
@@ -40,13 +67,16 @@ const Login = () => {
             onChange={(event) => setPassword(event.target.value)}
             type="password"
             required
-            className="w-full mt-2  pl-4 py-1.5 rounded border-2  outline-none  focus:border-indigo-500"
+            className="w-full mt-2  pl-4 py-1.5 rounded border-2  outline-none  focus:border-[#FF3B30]"
             placeholder="************"
           />
         </div>
 
         <div className="w-full  mt-2 ">
-          <button className=" w-full  mx-auto bg-indigo-500 hover:bg-indigo-600 text-white rounded  py-2 m-3 font-semibold">
+          <button
+            type="submit"
+            className=" w-full  mx-auto bg-[#FF3B30]  text-white rounded-sm  py-2 m-3 font-semibold"
+          >
             LOGIN
           </button>
         </div>

@@ -1,25 +1,32 @@
 import { Link } from "react-router-dom";
+import { useAuth } from "../contexts/auth-context";
 
 const Navbar = ({ setIsOpen }) => {
+  const { user } = useAuth();
   return (
     <div className=" h-14 bg-white sticky top-0 z-40 w-full  ">
       <div className="max-w-7xl mx-auto">
-        <nav>
-          <button className="lg:hidden  text-black" onClick={setIsOpen}>
-            <svg width="24" height="24">
-              <path
-                d="M5 6h14M5 12h14M5 18h14"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-                stroke-linecap="round"
-              ></path>
-            </svg>
-          </button>
+        <nav className="flex items-center justify-between">
+          <div>
+            <button className="lg:hidden  text-black" onClick={setIsOpen}>
+              <svg width="24" height="24">
+                <path
+                  d="M5 6h14M5 12h14M5 18h14"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                ></path>
+              </svg>
+            </button>
 
-          <Link to="/" className="font-bold text-2xl font-serif">
-            <span className=" text-[#FF3B30]">V</span>-Share
-          </Link>
+            <Link to="/" className="font-bold text-2xl font-serif">
+              <span className=" text-[#FF3B30]">V</span>-Share
+            </Link>
+          </div>
+          <div>
+            <h1 className="text-lg font-bold">👋 Hi ! {user.fullName} </h1>
+          </div>
         </nav>
       </div>
     </div>

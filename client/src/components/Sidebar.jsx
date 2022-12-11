@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router";
-import Input from "./Input";
+import Input from "./PostForm";
 import Modal from "./Modal";
 import SidebarData from "./SidebarData";
 import UserLogout from "./UserLogout";

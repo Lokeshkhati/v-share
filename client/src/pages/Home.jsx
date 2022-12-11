@@ -3,6 +3,7 @@ import { usePosts } from "../contexts/posts-context";
 
 const Home = () => {
   const { posts } = usePosts();
+
   return (
     <div className="relative">
       <Input />
