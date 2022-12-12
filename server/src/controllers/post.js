@@ -1,39 +1,158 @@
 import Post from "../models/post.js"
 import User from "../models/user.js"
-import comment from "../models/comment.js"
+import Comment from "../models/comment.js"
+import Notification from "../models/notification.js"
+import { CustomError } from "../utils/customError.js"
 
+const getAllPosts = async (req, res, next) => {
+    const posts = await Post.find()
+    res.status(200).json({ success: true, posts })
+}
 
 const createPost = async (req, res, next) => {
-    res.send('post created successfully')
+    const { content } = req.body
+
+    try {
+        const user = await User.findById(req.user.id)
+        console.log(user)
+        if (!user) {
+            return next(new CustomError('User Not Found', 404))
+        }
+
+        const post = await Post.create({
+            content,
+            author: user._id,
+            authorName: user.fullName,
+            authorUserName: user.username,
+            authorAvatar: user.avatar
+        })
+
+        user.posts.push(post._id)
+        await user.save()
+
+
+        console.log(post)
+        res.status(201).json({
+            message: "New Post created", success: true, post
+        })
+    } catch (error) {
+        return next(new CustomError(error.message, 500))
+    }
 }
-const getPost = async (req, res, next) => {
-    res.send('got post successfully')
-}
+
 const updatePost = async (req, res, next) => {
-    res.send(' post updated successfully')
+    const { id: postId } = req.params
+    const { content } = req.body
+
+    const post = await Post.findById(postId)
+
+    if (!post) {
+        return next(new CustomError(`No post found  with id :  ${postId}`, 500))
+    }
+
+    post.content = content
+    await post.save()
+    res.status(201).json({
+        message: "New Post created", success: true, post
+    })
 }
-const likePost = async (req, res, next) => {
-    res.send(' post liked successfully')
-}
-const unLikePost = async (req, res, next) => {
-    res.send(' post unlike successful')
-}
-const commentOnPost = async (req, res, next) => {
-    res.send(' commented on successfully')
-}
-const deleteComment = async (req, res, next) => {
-    res.send(' comment deleted successfully')
-}
+
 const deletePost = async (req, res, next) => {
-    res.send(' post deleted successfully')
+    try {
+        const { id: postId } = req.params
+        const { id: userId } = req.user
+
+        const post = await Post.findById(postId)
+
+        if (!post) {
+            return next(new CustomError('Post Not Found ', 404))
+        }
+
+        if (post?.author?.toString() !== userId) {
+            return next(new CustomError("Unauthorized ", 401))
+        }
+
+        await post.remove()
+        const user = await User.findById(userId)
+
+        const index = user.posts.indexOf(postId)
+        user.posts.splice(index, 1)
+        await user.save()
+        res.status(200).json({ success: true, message: "Post Deleted" })
+    } catch (error) {
+        return next(new CustomError(error.message, 500))
+    }
 }
+
+
+const likeAndUnlikePost = async (req, res, next) => {
+    try {
+        const { id: userId } = req.user
+        const { id: postId } = req.params
+
+        const post = await Post.findById(postId)
+        if (!post) {
+            return next(new CustomError('Post Not Found ', 404))
+        }
+
+        if (post.likes.includes(userId)) {
+            const index = post.likes.indexOf(userId)
+            post.likes.splice(index, 1)
+
+            await post.save();
+            return res.status(200).json({
+                success: true,
+                message: "Like removed from post ",
+            });
+        }
+
+        else {
+            post.likes.push(userId)
+            await post.save();
+            // await Notification(post.author, userId, "LIKED", postId);
+            return res.status(200).json({
+                success: true,
+                message: "Post Liked",
+
+            });
+        }
+    } catch (error) {
+        return next(new CustomError(error.message, 500))
+    }
+}
+
+const getPost = async (req, res, next) => {
+    res.json('got post successfully')
+}
+
+
+const commentOnPost = async (req, res, next) => {
+    res.json(' commented on successfully')
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+const deleteComment = async (req, res, next) => {
+    res.json(' comment deleted successfully')
+}
+
 const getLikes = async (req, res, next) => {
-    res.send(' likes fetched successfully')
+    res.json(' likes fetched successfully')
 }
 const getComments = async (req, res, next) => {
-    res.send(' comments fetched successfully')
+    res.json(' comments fetched successfully')
 }
 
 
-export { createPost, getPost, updatePost, deletePost, likePost, unLikePost, commentOnPost, deleteComment, getLikes, getComments }
+export { createPost, getPost, getAllPosts, updatePost, deletePost, likeAndUnlikePost, commentOnPost, deleteComment, getLikes, getComments }
 

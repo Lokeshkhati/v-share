@@ -37,10 +37,10 @@ const login = async (req, res, next) => {
         }
         const user = await User.findOne({ email, }).select("+password")
         if (!user) {
-            return next(new CustomError('You are not registerd', 400))
+            return next(new CustomError('You are not registered', 400))
         }
-        const isPasswordCorrect = await user.isValidatedPassword(password)
-        if (!isPasswordCorrect) {
+        const isMatch = await user.matchPassword(password)
+        if (!isMatch) {
             return next(new CustomError('Email or Password does not match or exist', 400))
         }
 
@@ -61,11 +61,75 @@ const logout = async (req, res) => {
     })
 }
 
-const getCurrentUser = async (req, res, next) => {
 
-    const user = await User.findById(req.user.id)
-    cookieToken(user, res)
+const getMyProfile = async (req, res, next) => {
+    try {
+        const user = await User.findById(req.user.id).populate('posts')
+        if (!user) {
+            return next(new CustomError('User Not Found', 404))
+        }
+
+        cookieToken(user, res)
+    } catch (error) {
+        return next(new CustomError(error.message, 500))
+    }
 }
 
-export { register, login, logout, getCurrentUser }
+const getUserProfile = async (req, res, next) => {
+    try {
+        const user = await User.findById(req.params.id).populate('posts')
+        if (!user) {
+            return next(new CustomError('User Not Found', 404))
+        }
+
+        res.status(200).json({ success: true, user })
+    } catch (error) {
+        return next(new CustomError(error.message, 500))
+    }
+}
+
+const getAllUsers = async (req, res, next) => {
+
+    const users = await User.find()
+    res.status(200).json({ success: true, users })
+}
+
+const followOrUnFollow = async (req, res, next) => {
+    try {
+        const userToFollow = await User.findById(req.params.id);
+        const loggedInUser = await User.findById(req.user.id);
+
+        if (!userToFollow) {
+            return next(new CustomError('User Not Found', 404))
+        }
+
+        if (loggedInUser.following.includes(userToFollow._id)) {
+
+            const followingIndex = loggedInUser.following.indexOf(userToFollow._id)
+            const followersIndex = loggedInUser.following.indexOf(loggedInUser._id)
+
+            loggedInUser.following.splice(followingIndex, 1)
+            userToFollow.followers.splice(followersIndex, 1)
+
+            await loggedInUser.save()
+            await userToFollow.save()
+
+            return res.status(200).json({ success: true, message: "User UnFollowed", });
+        }
+
+        loggedInUser.following.push(userToFollow._id);
+        userToFollow.followers.push(loggedInUser._id);
+
+        // await Notification(targetId, sourceId, "NEW_FOLLOWER", 0);
+
+        await loggedInUser.save();
+        await userToFollow.save();
+
+        return res.status(200).json({ success: true, message: "User Followed", });
+    } catch (error) {
+        res.status(500).json({ success: false, message: error.message });
+    }
+};
+
+export { register, login, logout, followOrUnFollow, getAllUsers, getUserProfile, getMyProfile }
 
